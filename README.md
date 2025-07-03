@@ -1,8 +1,14 @@
 # 🗂️ Todo Analyzer AI
 
-## 🚀 Quick Start
+A modern, AI-powered to-do application with natural language processing capabilities. Built with Next.js, Express.js, PostgreSQL, and Ollama integration.
 
-A modern, AI-powered todo application with natural language processing capabilities. Built with Next.js, Express.js, PostgreSQL, and Ollama integration.
+
+
+https://github.com/user-attachments/assets/c46923b1-ad90-4e7c-b542-c21b86007d2a
+
+
+
+## 🚀 Quick Start
 
 ### Prerequisites
 
