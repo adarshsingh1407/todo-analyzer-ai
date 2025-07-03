@@ -1,6 +1,63 @@
 # 🗂️ Todo Analyzer AI
 
+## 🚀 Quick Start
+
 A modern, AI-powered todo application with natural language processing capabilities. Built with Next.js, Express.js, PostgreSQL, and Ollama integration.
+
+### Prerequisites
+
+1. **Node.js 22**: Use the provided `.nvmrc` file
+   ```bash
+   nvm use
+   ```
+2. **Docker & Docker Compose**: For running the complete stack
+3. **Ollama**: For AI processing (run manually)
+
+   ```bash
+   # Install Ollama (if not already installed)
+   curl -fsSL https://ollama.ai/install.sh | sh
+
+   # Start Ollama server
+   ollama serve
+
+   # Pull and run the mistral model
+   ollama run mistral
+   ```
+
+### Running the Application
+
+#### Development Mode (with hot reloading)
+
+```bash
+docker compose up --build
+```
+
+- Mounts source code for hot reloading
+- Uses development Dockerfiles with watch mode
+- Restarts on file changes
+
+#### Production Mode
+
+```bash
+docker compose -f docker-compose.prod.yml up --build
+```
+
+- Open [http://localhost:8000](http://localhost:8000)
+- Left: Todo list (auto-updates)
+- Right: Chat interface for commands
+
+---
+
+## 🧠 Advanced Natural Language Support
+
+- **Add todos**: "add buy groceries"
+- **Mark as done**: "mark buy groceries as done"
+- **Mark in progress**: "mark buy groceries as in progress"
+- **Past tense = done**: "I took buzzy outside" (marks "take buzzy outside" as done)
+- **Status filtering**: "give me summary of remaining todos", "give me summary of todos in progress"
+- **Get summary**: "give me a summary"
+
+---
 
 ## 🏗️ Architecture
 
@@ -11,60 +68,6 @@ This project follows a microservices architecture with the following components:
 - **Todo Management Service** (`todo-management-service/`): CRUD operations for todos with PostgreSQL
 - **Todo Analyzer Service** (`todo-analyzer-service/`): AI-powered analysis and insights
 - **PostgreSQL**: Database for todo storage
-
-## 🚀 Quick Start
-
-### Prerequisites
-
-1. **Node.js 22**: Use the provided `.nvmrc` file
-
-   ```bash
-   nvm use
-   ```
-
-2. **Docker & Docker Compose**: For running the complete stack
-
-3. **Ollama**: For AI processing (run manually)
-
-   ```bash
-   # Install Ollama (if not already installed)
-   curl -fsSL https://ollama.ai/install.sh | sh
-
-   # Start Ollama server
-   ollama serve
-
-   # Pull and run the llama3 model
-   ollama run llama3
-   ```
-
-### Running the Application
-
-#### Development Mode (with hot reloading)
-
-1. **Start all services in development mode**:
-
-   ```bash
-   docker compose up --build
-   ```
-
-   This will:
-
-   - Mount source code volumes for hot reloading
-   - Use development Dockerfiles with watch mode
-   - Enable automatic restarts when files change
-
-#### Production Mode
-
-1. **Start all services in production mode**:
-
-   ```bash
-   docker compose -f docker-compose.prod.yml up --build
-   ```
-
-2. **Access the application**:
-   - Open [http://localhost:8000](http://localhost:8000)
-   - Left panel: Todo list (auto-updates)
-   - Right panel: Chat interface for commands
 
 ## 🎯 Features
 
@@ -125,14 +128,41 @@ todo-analyzer-ai/
 
 ### Technology Stack
 
-- **Frontend**: Next.js 15, TypeScript, Tailwind CSS
+- **Frontend**: Next.js 15.3.4, TypeScript, Tailwind CSS 4, React 19.0.0
 - **Backend**: Express.js 5.1.0, Node.js 22
 - **Database**: PostgreSQL 15
-- **AI**: Ollama with Llama3 model
+- **AI**: Ollama with Mistral model
 - **Package Manager**: pnpm
 - **Containerization**: Docker & Docker Compose
 
 ## 🔧 Configuration
+
+### API Endpoints
+
+#### MCP Server (Port 3000)
+
+- `POST /handle` - Process natural language commands via Ollama
+- `GET /todos` - Proxy to get all todos from todo-management-service
+- `GET /health` - Health check
+- `GET /` - Service information
+
+#### Todo Management Service (Port 4000)
+
+- `GET /todos` - Get all todos (supports `?status=filter` query parameter)
+- `POST /todos` - Create a new todo
+- `PATCH /todos/:id` - Update todo status
+- `DELETE /todos/:id` - Delete a todo
+- `GET /health` - Health check
+
+#### Todo Analyzer Service (Port 5001)
+
+- `POST /analyze` - Analyze todos and provide AI insights
+- `GET /health` - Health check
+
+#### UI (Port 8000)
+
+- Frontend application with React Query for state management
+- Real-time updates and optimistic UI updates
 
 ### Environment Variables
 
@@ -205,7 +235,7 @@ This project is open source and available under the [MIT License](LICENSE).
 
 ### Common Issues
 
-1. **Ollama not responding**: Ensure Ollama is running and llama3 model is available
+1. **Ollama not responding**: Ensure Ollama is running and mistral model is available
 2. **Database connection**: Check if PostgreSQL container is healthy
 3. **Port conflicts**: Ensure ports 8000, 3000, 4000, 5001, 5432 are available
 
