@@ -1,0 +1,91 @@
+version: "3.8"
+
+services:
+  # UI Service (Next.js)
+  ui:
+    build:
+      context: ./ui
+      dockerfile: Dockerfile.dev
+    ports:
+      - "8000:3000"
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./ui:/app
+      - /app/node_modules
+    depends_on:
+      - mcp-server
+    networks:
+      - backend
+
+  # MCP Server
+  mcp-server:
+    build:
+      context: ./mcp-server
+      dockerfile: Dockerfile.dev
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./mcp-server:/app
+      - /app/node_modules
+    depends_on:
+      - todo-management-service
+      - todo-analyzer-service
+    networks:
+      - backend
+
+  # Todo Management Service
+  todo-management-service:
+    build:
+      context: ./todo-management-service
+      dockerfile: Dockerfile.dev
+    ports:
+      - "4000:4000"
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./todo-management-service:/app
+      - /app/node_modules
+    depends_on:
+      - postgres
+    networks:
+      - backend
+
+  # Todo Analyzer Service
+  todo-analyzer-service:
+    build:
+      context: ./todo-analyzer-service
+      dockerfile: Dockerfile.dev
+    ports:
+      - "5001:5000"
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./todo-analyzer-service:/app
+      - /app/node_modules
+    networks:
+      - backend
+
+  # PostgreSQL Database
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      POSTGRES_USER: todo_user
+      POSTGRES_PASSWORD: todo_pass
+      POSTGRES_DB: todos
+    ports:
+      - "5432:5432"
+    volumes:
+      - db-data:/var/lib/postgresql/data
+      - ./todo-management-service/init.sql:/docker-entrypoint-initdb.d/init.sql
+    networks:
+      - backend
+
+volumes:
+  db-data:
+
+networks:
+  backend:
+    driver: bridge
